@@ -12,11 +12,12 @@ import type { Message, ChatConfig } from '../types';
 // ==================================================================================
 
 // Ensure the API key is available from environment variables
-if (!process.env.API_KEY) {
-  throw new Error("API_KEY environment variable not set");
+const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+if (!apiKey) {
+  throw new Error("VITE_GEMINI_API_KEY environment variable not set");
 }
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+const ai = new GoogleGenAI({ apiKey });
 
 const getCalendarEventsFunctionDeclaration: FunctionDeclaration = {
     name: 'get_calendar_events',
