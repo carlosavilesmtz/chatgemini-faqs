@@ -23,7 +23,7 @@ export interface ChatConfig {
   promotionsInfo: string;
   promotionsInfoCharLimit: number;
   faqs: FaqItem[];
-  googleCalendarIntegration: boolean;
+  
   speechVoice: string;
   enableSpeech: boolean;
   proactiveAssistant: boolean;

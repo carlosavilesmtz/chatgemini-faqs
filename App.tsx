@@ -67,39 +67,62 @@ const ChatInterface: React.FC<{
     lastExchangeCost: 0,
     totalSessionCost: 0,
   });
-  const [config, setConfig] = useState<ChatConfig>({
-    personality: 'Eres un asistente de atención al cliente servicial y amigable. Tu objetivo es resolver las dudas de los clientes sobre nuestros productos, servicios y políticas de la empresa de manera clara y concisa.',
-    model: 'gemini-2.5-flash',
-    minTokens: 100,
-    maxTokens: 400,
-    speechVoice: '',
-    enableSpeech: true,
-    companyInfo: "Somos 'Innovatech Solutions', una empresa líder en soluciones de software personalizadas. Fundada en 2010, nuestra misión es ayudar a las empresas a optimizar sus procesos a través de la tecnología. Nuestros valores son la innovación, la calidad y la satisfacción del cliente.",
-    companyInfoCharLimit: 2000,
-    productsInfo: "Ofrecemos tres productos principales:\n1. **Optimizador Pro**: Un sistema ERP para la gestión de recursos empresariales.\n2. **Conecta CRM**: Una plataforma para la gestión de relaciones con los clientes.\n3. **Analítica Web**: Herramientas de análisis de datos para sitios web y aplicaciones.",
-    productsInfoCharLimit: 2000,
-    promotionsInfo: "Actualmente tenemos dos promociones:\n- **20% de descuento** en la primera suscripción anual de 'Optimizador Pro'.\n- **Prueba gratuita de 30 días** para 'Conecta CRM' para nuevos clientes.",
-    promotionsInfoCharLimit: 1000,
-    faqs: [
-      {
-        id: 'faq-1',
-        question: '¿Cuál es el horario de atención al cliente?',
-        answer: 'Nuestro equipo de soporte está disponible de lunes a viernes, de 9:00 a.m. a 6:00 p.m. (hora central).'
-      },
-      {
-        id: 'faq-2',
-        question: '¿Ofrecen demostraciones de sus productos?',
-        answer: 'Sí, ofrecemos demostraciones personalizadas de todos nuestros productos. Puedes solicitar una en nuestro sitio web.'
-      },
-      {
-        id: 'faq-3',
-        question: '¿Qué métodos de pago aceptan?',
-        answer: 'Aceptamos tarjetas de crédito (Visa, MasterCard, American Express) y transferencias bancarias.'
+
+  const [config, setConfig] = useState<ChatConfig>(() => {
+    const defaultConfig: ChatConfig = {
+      personality: 'Eres un asistente de atención al cliente servicial y amigable. Tu objetivo es resolver las dudas de los clientes sobre nuestros productos, servicios y políticas de la empresa de manera clara y concisa.',
+      model: 'gemini-2.5-flash',
+      minTokens: 100,
+      maxTokens: 400,
+      speechVoice: '',
+      enableSpeech: true,
+      companyInfo: "Somos 'Innovatech Solutions', una empresa líder en soluciones de software personalizadas. Fundada en 2010, nuestra misión es ayudar a las empresas a optimizar sus procesos a través de la tecnología. Nuestros valores son la innovación, la calidad y la satisfacción del cliente.",
+      companyInfoCharLimit: 2000,
+      productsInfo: "Ofrecemos tres productos principales:\n1. **Optimizador Pro**: Un sistema ERP para la gestión de recursos empresariales.\n2. **Conecta CRM**: Una plataforma para la gestión de relaciones con los clientes.\n3. **Analítica Web**: Herramientas de análisis de datos para sitios web y aplicaciones.",
+      productsInfoCharLimit: 2000,
+      promotionsInfo: "Actualmente tenemos dos promociones:\n- **20% de descuento** en la primera suscripción anual de 'Optimizador Pro'.\n- **Prueba gratuita de 30 días** para 'Conecta CRM' para nuevos clientes.",
+      promotionsInfoCharLimit: 1000,
+      faqs: [
+        {
+          id: 'faq-1',
+          question: '¿Cuál es el horario de atención al cliente?',
+          answer: 'Nuestro equipo de soporte está disponible de lunes a viernes, de 9:00 a.m. a 6:00 p.m. (hora central).'
+        },
+        {
+          id: 'faq-2',
+          question: '¿Ofrecen demostraciones de sus productos?',
+          answer: 'Sí, ofrecemos demostraciones personalizadas de todos nuestros productos. Puedes solicitar una en nuestro sitio web.'
+        },
+        {
+          id: 'faq-3',
+          question: '¿Qué métodos de pago aceptan?',
+          answer: 'Aceptamos tarjetas de crédito (Visa, MasterCard, American Express) y transferencias bancarias.'
+        }
+      ],
+      proactiveAssistant: false,
+    };
+
+    try {
+      const savedConfig = localStorage.getItem('chatConfig');
+      if (savedConfig) {
+        // Merge saved config with default to ensure all keys are present
+        const parsedConfig = JSON.parse(savedConfig);
+        return { ...defaultConfig, ...parsedConfig };
       }
-    ],
-    googleCalendarIntegration: false,
-    proactiveAssistant: false,
+    } catch (error) {
+      console.error("Failed to load or parse config from localStorage:", error);
+    }
+    return defaultConfig;
   });
+
+  // Effect to save config to localStorage whenever it changes
+  useEffect(() => {
+    try {
+      localStorage.setItem('chatConfig', JSON.stringify(config));
+    } catch (error) {
+      console.error("Failed to save config to localStorage:", error);
+    }
+  }, [config]);
 
   // This effect will trigger the proactive assistant if enabled
   useEffect(() => {
