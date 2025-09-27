@@ -1,11 +1,12 @@
 
 import React, { useRef, useEffect } from 'react';
-import type { Message } from '../types';
+import type { Message, ChatConfig } from '../types';
 import ChatMessage from './ChatMessage';
 
 interface ChatWindowProps {
   messages: Message[];
   isLoading: boolean;
+  config: ChatConfig;
 }
 
 const LoadingIndicator: React.FC = () => (
@@ -25,7 +26,7 @@ const LoadingIndicator: React.FC = () => (
   </div>
 );
 
-const ChatWindow: React.FC<ChatWindowProps> = ({ messages, isLoading }) => {
+const ChatWindow: React.FC<ChatWindowProps> = ({ messages, isLoading, config }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -43,7 +44,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ messages, isLoading }) => {
         </div>
       )}
       {messages.map((msg, index) => (
-        <ChatMessage key={index} message={msg} />
+        <ChatMessage key={index} message={msg} speechVoice={config.speechVoice} enableSpeech={config.enableSpeech} />
       ))}
       {isLoading && <LoadingIndicator />}
     </div>

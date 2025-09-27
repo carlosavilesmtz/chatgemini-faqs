@@ -1,5 +1,5 @@
 
-import { GoogleGenAI, FunctionDeclaration, Type, Part } from "@google/genai";
+import { GoogleGenAI, FunctionDeclaration, Type, Part, UsageMetadata } from "@google/genai";
 import type { Message, ChatConfig } from '../types';
 
 // ==================================================================================
@@ -90,7 +90,7 @@ export const getChatResponse = async (
   newMessage: string,
   history: Message[],
   config: ChatConfig
-): Promise<string> => {
+): Promise<{ text: string; usageMetadata?: UsageMetadata }> => {
   try {
     const geminiModel = config.model;
     const fullHistory = buildGeminiHistory(history);
@@ -120,7 +120,7 @@ export const getChatResponse = async (
 
     const functionCalls = firstResponse.functionCalls;
     if (!functionCalls || functionCalls.length === 0) {
-      return firstResponse.text;
+      return { text: firstResponse.text, usageMetadata: firstResponse.usageMetadata };
     }
     
     // In a real app, you would execute the function. Here we simulate it.
@@ -151,13 +151,52 @@ export const getChatResponse = async (
             },
         });
         
-        return secondResponse.text;
+        return { text: secondResponse.text, usageMetadata: secondResponse.usageMetadata };
     }
 
-    return "Se ha producido un error al llamar a la función.";
+    return { text: "Se ha producido un error al llamar a la función.", usageMetadata: firstResponse.usageMetadata };
 
   } catch (error) {
     console.error("Error getting chat response:", error);
-    return "Lo siento, ocurrió un error al procesar tu solicitud. Por favor, revisa la configuración o intenta de nuevo más tarde.";
+    return { 
+        text: "Lo siento, ocurrió un error al procesar tu solicitud. Por favor, revisa la configuración o intenta de nuevo más tarde.",
+        usageMetadata: undefined
+    };
   }
+};
+
+export const enhancePrompt = async (text: string, contextType: string): Promise<string> => {
+    if (!text.trim()) return text;
+
+    const metaPrompt = `
+Eres un asistente de IA especializado en ingeniería de prompts. Tu tarea es refinar el siguiente texto proporcionado por un usuario para que sirva como una instrucción clara, estructurada y efectiva para otro asistente de IA.
+
+**Reglas Críticas:**
+1.  **NO añadas, inventes o elimines información factual.** El significado original y los datos deben preservarse por completo.
+2.  **Reformula el texto** para que sea una instrucción directa o una pieza de conocimiento contextual para un chatbot.
+3.  **Mejora el formato** utilizando markdown (como listas con guiones o asteriscos, y texto en negrita con **) para aumentar la claridad. No uses encabezados (#).
+4.  La respuesta debe ser únicamente el texto refinado, sin explicaciones adicionales.
+5.  El resultado debe estar en español.
+
+**Contexto del texto:** ${contextType}
+
+**Texto del Usuario a Refinar:**
+\`\`\`
+${text}
+\`\`\`
+
+**Texto Refinado:**
+    `;
+
+    try {
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: metaPrompt,
+        });
+        const enhancedText = response.text.trim();
+        return enhancedText || text; // Return original text if enhancement fails
+    } catch (error) {
+        console.error("Error enhancing prompt:", error);
+        return text; // Return original text on error
+    }
 };

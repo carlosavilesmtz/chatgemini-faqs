@@ -4,6 +4,8 @@ import type { Message } from '../types';
 
 interface ChatMessageProps {
   message: Message;
+  speechVoice: string;
+  enableSpeech: boolean;
 }
 
 const UserIcon = () => (
@@ -14,11 +16,20 @@ const UserIcon = () => (
 
 const AssistantIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-sky-400" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M14 2h-4c-.74 0-1.4.4-1.72 1.05L6.5 6.5l-1.45-1.72C5.03 4.75 5 4.7 5 4.69c0-.4.32-.7.71-.7h2.59l2-2.5C10.63 1.17 11.02 1 11.5 1s.87.17 1.2.5l2 2.5h2.59c.39 0 .71.3.71.7 0 .01 0 .02-.02.04l-1.45 1.72 1.78 3.45C20.6 11.4 21 12.16 21 13v3c0 .55-.45 1-1 1h-2v2a1 1 0 0 1-1 1h-8a1 1 0 0 1-1-1v-2H6c-.55 0-1-.45-1-1v-3c0-.84.4-1.6.98-2.05L7.5 6.5l-1.78-3.45C5.4 2.4 5 1.64 5 1a1 1 0 0 1 1-1h2c.74 0 1.4.4 1.72 1.05L11.5 4.5l1.78-3.45C13.6.4 14.26 0 15 0h4a1 1 0 0 1 1 1c0 .64-.4 1.4-.98 2.05L17.5 6.5l1.78 3.45c.1.2.16.4.19.62L19.5 10.5l.02.04c-.01 0-.01 0-.02-.04Z M12 12a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z" />
+    <path d="M12 2a2 2 0 0 0-2 2v2H8a2 2 0 0 0-2 2v2H4a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h2v2a2 2 0 0 0 2 2h2v2a2 2 0 0 0 2 2a2 2 0 0 0 2-2v-2h2a2 2 0 0 0 2-2v-2h2a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2h-2V8a2 2 0 0 0-2-2h-2V4a2 2 0 0 0-2-2zm-4 8h8v4H8v-4z"/>
   </svg>
 );
 
-const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
+
+const SpeakerIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-slate-300 group-hover:text-white transition-colors" viewBox="0 0 20 20" fill="currentColor">
+        <path fillRule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414z" clipRule="evenodd" />
+        <path d="M16.071 5.071a1 1 0 011.414 0A6.98 6.98 0 0119 10a6.98 6.98 0 01-1.515 4.929 1 1 0 11-1.414-1.414A4.982 4.982 0 0017 10a4.982 4.982 0 00-1.071-3.071 1 1 0 010-1.414z" />
+    </svg>
+);
+
+
+const ChatMessage: React.FC<ChatMessageProps> = ({ message, speechVoice, enableSpeech }) => {
   const isUser = message.role === 'user';
 
   const formatContent = (text: string) => {
@@ -26,6 +37,30 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
     const formattedText = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
     return { __html: formattedText };
   };
+
+  const handleSpeak = () => {
+    if ('speechSynthesis' in window && message.content) {
+      // Cancel any ongoing speech
+      window.speechSynthesis.cancel();
+      
+      // Clean up markdown for better pronunciation
+      const textToSpeak = message.content.replace(/\*\*/g, '');
+      const utterance = new SpeechSynthesisUtterance(textToSpeak);
+      utterance.lang = 'es-ES'; // Set language to Spanish
+
+      // Find and set the selected voice
+      const voices = window.speechSynthesis.getVoices();
+      const selectedVoice = voices.find(voice => voice.name === speechVoice);
+      if (selectedVoice) {
+        utterance.voice = selectedVoice;
+      }
+      
+      window.speechSynthesis.speak(utterance);
+    } else {
+      alert('Tu navegador no soporta la síntesis de voz.');
+    }
+  };
+
 
   return (
     <div className={`flex items-start gap-4 my-4 ${isUser ? 'justify-end' : 'justify-start'}`}>
@@ -35,7 +70,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
         </div>
       )}
       <div
-        className={`max-w-xl rounded-xl px-4 py-3 shadow-md ${
+        className={`relative group max-w-xl rounded-xl px-4 py-3 shadow-md ${
           isUser
             ? 'bg-sky-600 text-white rounded-br-none'
             : 'bg-slate-700 text-slate-200 rounded-bl-none'
@@ -45,6 +80,15 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
           className="text-sm whitespace-pre-wrap"
           dangerouslySetInnerHTML={formatContent(message.content)}
         />
+        {!isUser && message.content && enableSpeech && (
+           <button 
+             onClick={handleSpeak}
+             className="absolute -bottom-3 -right-3 p-1.5 rounded-full bg-slate-600 hover:bg-sky-600 opacity-0 group-hover:opacity-100 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-sky-500"
+             aria-label="Leer mensaje en voz alta"
+           >
+             <SpeakerIcon />
+           </button>
+        )}
       </div>
        {isUser && (
         <div className="flex-shrink-0 w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center">

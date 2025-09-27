@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import type { ChatConfig, FaqItem } from '../types';
+import { enhancePrompt } from '../services/geminiService';
 
 interface SettingsPanelProps {
   config: ChatConfig;
@@ -10,10 +11,55 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ config, onConfigChange })
   const MAX_FAQS = 10;
   const [localConfig, setLocalConfig] = useState<ChatConfig>(config);
   const [isSaved, setIsSaved] = useState(false);
+  const [availableVoices, setAvailableVoices] = useState<SpeechSynthesisVoice[]>([]);
+  const [isEnhancing, setIsEnhancing] = useState({
+    companyInfo: false,
+    productsInfo: false,
+    promotionsInfo: false,
+  });
 
   useEffect(() => {
     setLocalConfig(config);
   }, [config]);
+
+  // Effect to load available speech synthesis voices from the browser
+  useEffect(() => {
+    const getAndSetVoices = () => {
+      const voices = window.speechSynthesis.getVoices();
+      if (voices.length > 0) {
+        setAvailableVoices(voices);
+      }
+    };
+
+    if (typeof window !== 'undefined' && window.speechSynthesis) {
+      getAndSetVoices();
+      window.speechSynthesis.onvoiceschanged = getAndSetVoices;
+    }
+
+    return () => {
+      if (typeof window !== 'undefined' && window.speechSynthesis) {
+        window.speechSynthesis.onvoiceschanged = null;
+      }
+    };
+  }, []);
+
+  // Effect to set a default voice once voices are loaded, if one isn't already set
+  useEffect(() => {
+    if (availableVoices.length > 0 && !localConfig.speechVoice) {
+      const spanishVoices = availableVoices.filter(v => v.lang.startsWith('es'));
+      const defaultVoice =
+        spanishVoices.find(v => v.name.includes('Google') && v.lang === 'es-ES') ||
+        spanishVoices.find(v => v.lang === 'es-ES') ||
+        spanishVoices.find(v => v.lang === 'es-US') ||
+        spanishVoices[0] ||
+        availableVoices[0];
+
+      if (defaultVoice) {
+        setLocalConfig(prev => ({ ...prev, speechVoice: defaultVoice.name }));
+      }
+    }
+  }, [availableVoices, localConfig.speechVoice]);
+
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement | HTMLSelectElement | HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -66,6 +112,23 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ config, onConfigChange })
     return () => clearTimeout(timer);
   };
 
+  const handleEnhanceClick = async (
+    field: 'companyInfo' | 'productsInfo' | 'promotionsInfo',
+    context: string
+  ) => {
+    setIsEnhancing(prev => ({ ...prev, [field]: true }));
+    try {
+        const currentText = localConfig[field];
+        const enhancedText = await enhancePrompt(currentText, context);
+        setLocalConfig(prev => ({ ...prev, [field]: enhancedText }));
+    } catch (error) {
+        console.error(`Failed to enhance ${field}:`, error);
+        // Optionally, show an error message to the user
+    } finally {
+        setIsEnhancing(prev => ({ ...prev, [field]: false }));
+    }
+  };
+
   return (
     <div className="w-full lg:w-96 bg-slate-800 flex flex-col border-l border-slate-700 h-full">
       {/* Scrollable Area */}
@@ -96,6 +159,66 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ config, onConfigChange })
             <label htmlFor="model" className="text-sm font-medium text-slate-300">Modelo de IA</label>
             <select id="model" name="model" value={localConfig.model} onChange={handleInputChange} className="bg-slate-700 border border-slate-600 text-white text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5 transition duration-200">
               <option value="gemini-2.5-flash">gemini-2.5-flash</option>
+              <option value="gemini-2.5-flash-lite">gemini-2.5-flash-lite (más económico)</option>
+            </select>
+          </div>
+          <div className="flex items-center justify-between bg-slate-700/50 p-3 rounded-lg">
+              <div className="flex flex-col">
+                  <label htmlFor="enableSpeech" className="text-sm font-medium text-slate-200 cursor-pointer">
+                  Habilitar Audio de Voz
+                  </label>
+                  <p className="text-xs text-slate-400">Permite reproducir las respuestas del asistente.</p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                  <input 
+                  type="checkbox" 
+                  id="enableSpeech" 
+                  name="enableSpeech"
+                  checked={localConfig.enableSpeech} 
+                  onChange={handleCheckboxChange} 
+                  className="sr-only peer" 
+                  />
+                  <div className="w-11 h-6 bg-slate-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-sky-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-sky-600"></div>
+              </label>
+          </div>
+          <div className="flex items-center justify-between bg-slate-700/50 p-3 rounded-lg">
+              <div className="flex flex-col">
+                  <label htmlFor="proactiveAssistant" className="text-sm font-medium text-slate-200 cursor-pointer">
+                  Asistente Proactivo
+                  </label>
+                  <p className="text-xs text-slate-400">Permite que el asistente inicie la conversación.</p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                  <input 
+                  type="checkbox" 
+                  id="proactiveAssistant" 
+                  name="proactiveAssistant"
+                  checked={localConfig.proactiveAssistant} 
+                  onChange={handleCheckboxChange} 
+                  className="sr-only peer" 
+                  />
+                  <div className="w-11 h-6 bg-slate-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-sky-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-sky-600"></div>
+              </label>
+          </div>
+          <div className="flex flex-col space-y-2">
+            <label htmlFor="speechVoice" className="text-sm font-medium text-slate-300">Voz del Asistente</label>
+            <select
+              id="speechVoice"
+              name="speechVoice"
+              value={localConfig.speechVoice}
+              onChange={handleInputChange}
+              className="bg-slate-700 border border-slate-600 text-white text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={availableVoices.length === 0 || !localConfig.enableSpeech}
+            >
+              {availableVoices.length === 0 ? (
+                <option>Cargando voces...</option>
+              ) : (
+                availableVoices.map(voice => (
+                  <option key={voice.name} value={voice.name}>
+                    {`${voice.name} (${voice.lang})`}
+                  </option>
+                ))
+              )}
             </select>
           </div>
           <div className="grid grid-cols-2 gap-4">
@@ -151,6 +274,9 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ config, onConfigChange })
                 <input type="number" name="companyInfoCharLimit" value={localConfig.companyInfoCharLimit} onChange={handleInputChange} className="w-20 bg-slate-600 text-white text-center rounded" min="100" max="5000" step="100" />
                 <span>{`${localConfig.companyInfo.length} / ${localConfig.companyInfoCharLimit}`}</span>
             </div>
+             <button onClick={() => handleEnhanceClick('companyInfo', 'Información de la Empresa')} disabled={isEnhancing.companyInfo} className="mt-2 w-full text-sm font-medium text-sky-400 bg-sky-400/10 hover:bg-sky-400/20 disabled:bg-slate-700 disabled:text-slate-400 disabled:cursor-not-allowed py-2 px-4 rounded-lg transition-colors">
+              {isEnhancing.companyInfo ? 'Mejorando...' : 'Mejorar con IA ✨'}
+            </button>
           </div>
 
           <div className="flex flex-col space-y-2">
@@ -161,6 +287,9 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ config, onConfigChange })
                 <input type="number" name="productsInfoCharLimit" value={localConfig.productsInfoCharLimit} onChange={handleInputChange} className="w-20 bg-slate-600 text-white text-center rounded" min="100" max="5000" step="100" />
                 <span>{`${localConfig.productsInfo.length} / ${localConfig.productsInfoCharLimit}`}</span>
             </div>
+            <button onClick={() => handleEnhanceClick('productsInfo', 'Productos y Servicios')} disabled={isEnhancing.productsInfo} className="mt-2 w-full text-sm font-medium text-sky-400 bg-sky-400/10 hover:bg-sky-400/20 disabled:bg-slate-700 disabled:text-slate-400 disabled:cursor-not-allowed py-2 px-4 rounded-lg transition-colors">
+              {isEnhancing.productsInfo ? 'Mejorando...' : 'Mejorar con IA ✨'}
+            </button>
           </div>
 
           <div className="flex flex-col space-y-2">
@@ -171,6 +300,9 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ config, onConfigChange })
                 <input type="number" name="promotionsInfoCharLimit" value={localConfig.promotionsInfoCharLimit} onChange={handleInputChange} className="w-20 bg-slate-600 text-white text-center rounded" min="50" max="2000" step="50" />
                 <span>{`${localConfig.promotionsInfo.length} / ${localConfig.promotionsInfoCharLimit}`}</span>
             </div>
+            <button onClick={() => handleEnhanceClick('promotionsInfo', 'Promociones Actuales')} disabled={isEnhancing.promotionsInfo} className="mt-2 w-full text-sm font-medium text-sky-400 bg-sky-400/10 hover:bg-sky-400/20 disabled:bg-slate-700 disabled:text-slate-400 disabled:cursor-not-allowed py-2 px-4 rounded-lg transition-colors">
+              {isEnhancing.promotionsInfo ? 'Mejorando...' : 'Mejorar con IA ✨'}
+            </button>
           </div>
         </div>
 

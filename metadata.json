@@ -1,5 +1,7 @@
 {
   "name": "Asistente de Clientes IA",
   "description": "Un chatbot de atención al cliente configurable que utiliza la API de Gemini para responder preguntas sobre un negocio, sus productos y servicios. Los usuarios pueden personalizar la personalidad del asistente, el modelo de IA y los límites de tokens.",
-  "requestFramePermissions": []
+  "requestFramePermissions": [
+    "microphone"
+  ]
 }
