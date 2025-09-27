@@ -94,7 +94,7 @@ const ChatInterface: React.FC = () => {
         answer: 'Aceptamos tarjetas de crédito (Visa, MasterCard, American Express) y transferencias bancarias.'
       }
     ],
-    googleCalendarIntegration: false,
+    
     proactiveAssistant: false,
   });
 

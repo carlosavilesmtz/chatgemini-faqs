@@ -233,31 +233,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ config, onConfigChange })
           </div>
         </div>
         
-        <div className="border-t border-slate-700"></div>
         
-        {/* Integrations */}
-        <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-white">Integraciones</h3>
-            <div className="flex items-center justify-between bg-slate-700/50 p-3 rounded-lg">
-                <div className="flex flex-col">
-                    <label htmlFor="googleCalendarIntegration" className="text-sm font-medium text-slate-200 cursor-pointer">
-                    Google Calendar (Simulado)
-                    </label>
-                    <p className="text-xs text-slate-400">Permite al asistente consultar tu agenda.</p>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                    <input 
-                    type="checkbox" 
-                    id="googleCalendarIntegration" 
-                    name="googleCalendarIntegration"
-                    checked={localConfig.googleCalendarIntegration} 
-                    onChange={handleCheckboxChange} 
-                    className="sr-only peer" 
-                    />
-                    <div className="w-11 h-6 bg-slate-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-sky-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-sky-600"></div>
-                </label>
-            </div>
-        </div>
 
 
         <div className="border-t border-slate-700"></div>
