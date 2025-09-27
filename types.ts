@@ -27,6 +27,10 @@ export interface ChatConfig {
   speechVoice: string;
   enableSpeech: boolean;
   proactiveAssistant: boolean;
+
+  googleCalendar: {
+    isConnected: boolean;
+  };
 }
 
 export interface UsageStats {

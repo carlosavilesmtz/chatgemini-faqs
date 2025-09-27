@@ -99,6 +99,16 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ config, onConfigChange, o
     setLocalConfig({ ...localConfig, faqs: updatedFaqs });
   };
 
+  const handleGoogleDisconnect = () => {
+    setLocalConfig(prevConfig => ({
+        ...prevConfig,
+        googleCalendar: {
+            ...prevConfig.googleCalendar,
+            isConnected: false,
+        },
+    }));
+  };
+
   const handleSave = () => {
     // Clamp values to be within reasonable limits on save
     const clampedConfig = {
@@ -250,24 +260,33 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ config, onConfigChange, o
         {/* Integrations */}
         <div className="space-y-4">
             <h3 className="text-lg font-semibold text-white">Integraciones</h3>
-            <div className="flex items-center justify-between bg-slate-700/50 p-3 rounded-lg">
-                <div className="flex flex-col">
-                    <label htmlFor="googleCalendarIntegration" className="text-sm font-medium text-slate-200 cursor-pointer">
-                    Google Calendar (Simulado)
-                    </label>
-                    <p className="text-xs text-slate-400">Permite al asistente consultar tu agenda.</p>
+            <div className="bg-slate-700/50 p-3 rounded-lg">
+                <div className="flex items-center justify-between">
+                    <div className="flex flex-col">
+                        <h4 className="text-sm font-medium text-slate-200">
+                            Google Calendar
+                        </h4>
+                        <p className="text-xs text-slate-400">Permite al asistente consultar tu agenda.</p>
+                    </div>
+                    {!localConfig.googleCalendar?.isConnected ? (
+                        <a
+                            href="http://localhost:4000/auth/google" // Backend en puerto 4000
+                            className="bg-blue-600 text-white text-sm font-bold py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+                        >
+                            Conectar
+                        </a>
+                    ) : (
+                        <div className="flex items-center space-x-3">
+                            <span className="text-sm text-green-400">Conectado</span>
+                            <button
+                                onClick={handleGoogleDisconnect}
+                                className="bg-red-600 text-white text-xs font-bold py-1 px-3 rounded-lg hover:bg-red-700 transition-colors"
+                            >
+                                Desconectar
+                            </button>
+                        </div>
+                    )}
                 </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                    <input 
-                    type="checkbox" 
-                    id="googleCalendarIntegration" 
-                    name="googleCalendarIntegration"
-                    checked={localConfig.googleCalendarIntegration} 
-                    onChange={handleCheckboxChange} 
-                    className="sr-only peer" 
-                    />
-                    <div className="w-11 h-6 bg-slate-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-amber-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-600"></div>
-                </label>
             </div>
         </div>
 

@@ -61,26 +61,71 @@ export const getChatResponse = async (
   try {
     const geminiModel = config.model;
     const fullHistory = buildGeminiHistory(history);
-    const contents = [
-      ...fullHistory,
-      { role: 'user', parts: [{ text: newMessage }] }
-    ];
-
     const systemInstruction = buildSystemInstruction(config);
 
-    const response = await ai.models.generateContent({
-        model: geminiModel,
-        contents,
-        config: {
-            systemInstruction,
-            maxOutputTokens: config.maxTokens,
-            temperature: 0.7,
-            topP: 0.9,
-            topK: 40,
+    // Define la herramienta de Google Calendar
+    const calendarTool = {
+      functionDeclarations: [
+        {
+          name: 'check_calendar_availability',
+          description: 'Consulta la agenda de Google Calendar para verificar si hay horarios disponibles o si un horario específico está ocupado.',
+          parameters: {
+            type: 'OBJECT',
+            properties: {
+              startTime: { type: 'STRING', description: 'Fecha y hora de inicio en formato ISO 8601' },
+              endTime: { type: 'STRING', description: 'Fecha y hora de fin en formato ISO 8601' },
+            },
+            required: ['startTime', 'endTime'],
+          },
         },
+      ],
+    };
+
+    const model = ai.getGenerativeModel({
+        model: geminiModel,
+        systemInstruction,
+        tools: config.googleCalendar.isConnected ? [calendarTool] : undefined,
     });
 
-    return { text: response.text, usageMetadata: response.usageMetadata };
+    const chat = model.startChat({ history: fullHistory });
+    const result = await chat.sendMessage(newMessage);
+    const response = result.response;
+
+    const functionCall = response.functionCalls()?.[0];
+
+    if (functionCall && functionCall.name === 'check_calendar_availability') {
+        const { startTime, endTime } = functionCall.args;
+        console.log('Gemini wants to check calendar:', { startTime, endTime });
+
+        // Llamada al backend para consultar la disponibilidad
+        const apiResponse = await fetch('http://localhost:4000/api/calendar/free-busy', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ startTime, endTime }),
+        });
+
+        if (!apiResponse.ok) {
+            throw new Error(`API Error: ${apiResponse.statusText}`);
+        }
+
+        const busyIntervals = await apiResponse.json();
+
+        // Enviar el resultado de la herramienta de vuelta a Gemini
+        const toolResult = await chat.sendMessage([
+            {
+                functionResponse: {
+                    name: 'check_calendar_availability',
+                    response: { busy: busyIntervals },
+                },
+            },
+        ]);
+        
+        // Devolver la respuesta final del modelo
+        return { text: toolResult.response.text(), usageMetadata: response.usageMetadata };
+    }
+
+    // Si no hay function call, devolver la respuesta de texto directamente
+    return { text: response.text(), usageMetadata: response.usageMetadata };
 
   } catch (error) {
     console.error("Error getting chat response:", error);

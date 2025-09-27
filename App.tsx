@@ -100,6 +100,7 @@ const ChatInterface: React.FC<{
         }
       ],
       proactiveAssistant: false,
+      googleCalendar: { isConnected: false },
     };
 
     try {
@@ -123,6 +124,23 @@ const ChatInterface: React.FC<{
       console.error("Failed to save config to localStorage:", error);
     }
   }, [config]);
+
+  // Effect to handle Google Calendar connection callback
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('google_auth') === 'success') {
+      console.log("Google Calendar connected successfully!");
+      setConfig(prevConfig => ({
+        ...prevConfig,
+        googleCalendar: {
+          ...prevConfig.googleCalendar,
+          isConnected: true,
+        },
+      }));
+      // Clean the URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, []); // Runs only once on component mount
 
   // This effect will trigger the proactive assistant if enabled
   useEffect(() => {
