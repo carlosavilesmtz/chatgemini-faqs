@@ -15,7 +15,7 @@ const UserIcon = () => (
 );
 
 const AssistantIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-sky-400" viewBox="0 0 24 24" fill="currentColor">
+  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-amber-400" viewBox="0 0 24 24" fill="currentColor">
     <path d="M12 2a2 2 0 0 0-2 2v2H8a2 2 0 0 0-2 2v2H4a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h2v2a2 2 0 0 0 2 2h2v2a2 2 0 0 0 2 2a2 2 0 0 0 2-2v-2h2a2 2 0 0 0 2-2v-2h2a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2h-2V8a2 2 0 0 0-2-2h-2V4a2 2 0 0 0-2-2zm-4 8h8v4H8v-4z"/>
   </svg>
 );
@@ -72,7 +72,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, speechVoice, enableS
       <div
         className={`relative group max-w-xl rounded-xl px-4 py-3 shadow-md ${
           isUser
-            ? 'bg-sky-600 text-white rounded-br-none'
+            ? 'bg-amber-600 text-white rounded-br-none'
             : 'bg-slate-700 text-slate-200 rounded-bl-none'
         }`}
       >
@@ -83,7 +83,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, speechVoice, enableS
         {!isUser && message.content && enableSpeech && (
            <button 
              onClick={handleSpeak}
-             className="absolute -bottom-3 -right-3 p-1.5 rounded-full bg-slate-600 hover:bg-sky-600 opacity-0 group-hover:opacity-100 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-sky-500"
+             className="absolute -bottom-3 -right-3 p-1.5 rounded-full bg-slate-600 hover:bg-amber-600 opacity-0 group-hover:opacity-100 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-amber-500"
              aria-label="Leer mensaje en voz alta"
            >
              <SpeakerIcon />

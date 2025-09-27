@@ -5,9 +5,10 @@ import { enhancePrompt } from '../services/geminiService';
 interface SettingsPanelProps {
   config: ChatConfig;
   onConfigChange: (newConfig: ChatConfig) => void;
+  onHide: () => void;
 }
 
-const SettingsPanel: React.FC<SettingsPanelProps> = ({ config, onConfigChange }) => {
+const SettingsPanel: React.FC<SettingsPanelProps> = ({ config, onConfigChange, onHide }) => {
   const MAX_FAQS = 10;
   const [localConfig, setLocalConfig] = useState<ChatConfig>(config);
   const [isSaved, setIsSaved] = useState(false);
@@ -130,12 +131,23 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ config, onConfigChange })
   };
 
   return (
-    <div className="w-full lg:w-96 bg-slate-800 flex flex-col border-l border-slate-700 h-full">
+    <div className="bg-gray-900 flex flex-col border-l border-slate-700 h-full">
       {/* Scrollable Area */}
       <div className="flex-1 overflow-y-auto p-6 space-y-6">
-        <div>
-          <h2 className="text-2xl font-bold text-white mb-2">Configuración</h2>
-          <p className="text-sm text-slate-400">Define la personalidad y el conocimiento de tu asistente.</p>
+        <div className="flex justify-between items-start">
+            <div>
+              <h2 className="text-2xl font-bold text-white mb-2">Configuración</h2>
+              <p className="text-sm text-slate-400">Define la personalidad y el conocimiento de tu asistente.</p>
+            </div>
+             <button 
+                onClick={onHide}
+                className="hidden lg:block text-slate-400 hover:text-white transition-colors"
+                aria-label="Ocultar panel"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+                </svg>
+            </button>
         </div>
 
         <div className="border-t border-slate-700"></div>
@@ -151,13 +163,13 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ config, onConfigChange })
               rows={4}
               value={localConfig.personality}
               onChange={handleInputChange}
-              className="bg-slate-700 border border-slate-600 text-white text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5 transition duration-200"
+              className="bg-slate-700 border border-slate-600 text-white text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block w-full p-2.5 transition duration-200"
               placeholder="Ej: Eres un asistente amigable y servicial..."
             />
           </div>
           <div className="flex flex-col space-y-2">
             <label htmlFor="model" className="text-sm font-medium text-slate-300">Modelo de IA</label>
-            <select id="model" name="model" value={localConfig.model} onChange={handleInputChange} className="bg-slate-700 border border-slate-600 text-white text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5 transition duration-200">
+            <select id="model" name="model" value={localConfig.model} onChange={handleInputChange} className="bg-slate-700 border border-slate-600 text-white text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block w-full p-2.5 transition duration-200">
               <option value="gemini-2.5-flash">gemini-2.5-flash</option>
               <option value="gemini-2.5-flash-lite">gemini-2.5-flash-lite (más económico)</option>
             </select>
@@ -178,7 +190,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ config, onConfigChange })
                   onChange={handleCheckboxChange} 
                   className="sr-only peer" 
                   />
-                  <div className="w-11 h-6 bg-slate-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-sky-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-sky-600"></div>
+                  <div className="w-11 h-6 bg-slate-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-amber-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-600"></div>
               </label>
           </div>
           <div className="flex items-center justify-between bg-slate-700/50 p-3 rounded-lg">
@@ -197,7 +209,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ config, onConfigChange })
                   onChange={handleCheckboxChange} 
                   className="sr-only peer" 
                   />
-                  <div className="w-11 h-6 bg-slate-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-sky-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-sky-600"></div>
+                  <div className="w-11 h-6 bg-slate-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-amber-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-600"></div>
               </label>
           </div>
           <div className="flex flex-col space-y-2">
@@ -207,7 +219,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ config, onConfigChange })
               name="speechVoice"
               value={localConfig.speechVoice}
               onChange={handleInputChange}
-              className="bg-slate-700 border border-slate-600 text-white text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-slate-700 border border-slate-600 text-white text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block w-full p-2.5 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={availableVoices.length === 0 || !localConfig.enableSpeech}
             >
               {availableVoices.length === 0 ? (
@@ -224,16 +236,40 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ config, onConfigChange })
           <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col space-y-2">
                 <label htmlFor="minTokens" className="text-sm font-medium text-slate-300">Tokens Mín.</label>
-                <input type="number" id="minTokens" name="minTokens" value={localConfig.minTokens} onChange={handleInputChange} min="50" max="1000" step="10" className="bg-slate-700 border border-slate-600 text-white text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5 transition duration-200" />
+                <input type="number" id="minTokens" name="minTokens" value={localConfig.minTokens} onChange={handleInputChange} min="50" max="1000" step="10" className="bg-slate-700 border border-slate-600 text-white text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block w-full p-2.5 transition duration-200" />
             </div>
             <div className="flex flex-col space-y-2">
               <label htmlFor="maxTokens" className="text-sm font-medium text-slate-300">Tokens Máx.</label>
-              <input type="number" id="maxTokens" name="maxTokens" value={localConfig.maxTokens} onChange={handleInputChange} min="100" max="8192" step="10" className="bg-slate-700 border border-slate-600 text-white text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5 transition duration-200" />
+              <input type="number" id="maxTokens" name="maxTokens" value={localConfig.maxTokens} onChange={handleInputChange} min="100" max="8192" step="10" className="bg-slate-700 border border-slate-600 text-white text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block w-full p-2.5 transition duration-200" />
             </div>
           </div>
         </div>
         
+        <div className="border-t border-slate-700"></div>
         
+        {/* Integrations */}
+        <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-white">Integraciones</h3>
+            <div className="flex items-center justify-between bg-slate-700/50 p-3 rounded-lg">
+                <div className="flex flex-col">
+                    <label htmlFor="googleCalendarIntegration" className="text-sm font-medium text-slate-200 cursor-pointer">
+                    Google Calendar (Simulado)
+                    </label>
+                    <p className="text-xs text-slate-400">Permite al asistente consultar tu agenda.</p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                    <input 
+                    type="checkbox" 
+                    id="googleCalendarIntegration" 
+                    name="googleCalendarIntegration"
+                    checked={localConfig.googleCalendarIntegration} 
+                    onChange={handleCheckboxChange} 
+                    className="sr-only peer" 
+                    />
+                    <div className="w-11 h-6 bg-slate-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-amber-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-600"></div>
+                </label>
+            </div>
+        </div>
 
 
         <div className="border-t border-slate-700"></div>
@@ -244,39 +280,39 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ config, onConfigChange })
           
           <div className="flex flex-col space-y-2">
             <label htmlFor="companyInfo" className="text-sm font-medium text-slate-300">Información de la Empresa</label>
-            <textarea id="companyInfo" name="companyInfo" rows={5} value={localConfig.companyInfo} onChange={handleInputChange} className="bg-slate-700 border border-slate-600 text-white text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5 transition duration-200" placeholder="Describe tu empresa, misión, visión, etc." maxLength={localConfig.companyInfoCharLimit} />
+            <textarea id="companyInfo" name="companyInfo" rows={5} value={localConfig.companyInfo} onChange={handleInputChange} className="bg-slate-700 border border-slate-600 text-white text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block w-full p-2.5 transition duration-200" placeholder="Describe tu empresa, misión, visión, etc." maxLength={localConfig.companyInfoCharLimit} />
             <div className="flex justify-between items-center text-xs text-slate-400 mt-1">
                 <span>Límite de caracteres:</span>
                 <input type="number" name="companyInfoCharLimit" value={localConfig.companyInfoCharLimit} onChange={handleInputChange} className="w-20 bg-slate-600 text-white text-center rounded" min="100" max="5000" step="100" />
                 <span>{`${localConfig.companyInfo.length} / ${localConfig.companyInfoCharLimit}`}</span>
             </div>
-             <button onClick={() => handleEnhanceClick('companyInfo', 'Información de la Empresa')} disabled={isEnhancing.companyInfo} className="mt-2 w-full text-sm font-medium text-sky-400 bg-sky-400/10 hover:bg-sky-400/20 disabled:bg-slate-700 disabled:text-slate-400 disabled:cursor-not-allowed py-2 px-4 rounded-lg transition-colors">
+             <button onClick={() => handleEnhanceClick('companyInfo', 'Información de la Empresa')} disabled={isEnhancing.companyInfo} className="mt-2 w-full text-sm font-medium text-amber-400 bg-amber-400/10 hover:bg-amber-400/20 disabled:bg-slate-700 disabled:text-slate-400 disabled:cursor-not-allowed py-2 px-4 rounded-lg transition-colors">
               {isEnhancing.companyInfo ? 'Mejorando...' : 'Mejorar con IA ✨'}
             </button>
           </div>
 
           <div className="flex flex-col space-y-2">
             <label htmlFor="productsInfo" className="text-sm font-medium text-slate-300">Productos y Servicios</label>
-            <textarea id="productsInfo" name="productsInfo" rows={5} value={localConfig.productsInfo} onChange={handleInputChange} className="bg-slate-700 border border-slate-600 text-white text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5 transition duration-200" placeholder="Detalla tus productos o servicios." maxLength={localConfig.productsInfoCharLimit} />
+            <textarea id="productsInfo" name="productsInfo" rows={5} value={localConfig.productsInfo} onChange={handleInputChange} className="bg-slate-700 border border-slate-600 text-white text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block w-full p-2.5 transition duration-200" placeholder="Detalla tus productos o servicios." maxLength={localConfig.productsInfoCharLimit} />
             <div className="flex justify-between items-center text-xs text-slate-400 mt-1">
                 <span>Límite de caracteres:</span>
                 <input type="number" name="productsInfoCharLimit" value={localConfig.productsInfoCharLimit} onChange={handleInputChange} className="w-20 bg-slate-600 text-white text-center rounded" min="100" max="5000" step="100" />
                 <span>{`${localConfig.productsInfo.length} / ${localConfig.productsInfoCharLimit}`}</span>
             </div>
-            <button onClick={() => handleEnhanceClick('productsInfo', 'Productos y Servicios')} disabled={isEnhancing.productsInfo} className="mt-2 w-full text-sm font-medium text-sky-400 bg-sky-400/10 hover:bg-sky-400/20 disabled:bg-slate-700 disabled:text-slate-400 disabled:cursor-not-allowed py-2 px-4 rounded-lg transition-colors">
+            <button onClick={() => handleEnhanceClick('productsInfo', 'Productos y Servicios')} disabled={isEnhancing.productsInfo} className="mt-2 w-full text-sm font-medium text-amber-400 bg-amber-400/10 hover:bg-amber-400/20 disabled:bg-slate-700 disabled:text-slate-400 disabled:cursor-not-allowed py-2 px-4 rounded-lg transition-colors">
               {isEnhancing.productsInfo ? 'Mejorando...' : 'Mejorar con IA ✨'}
             </button>
           </div>
 
           <div className="flex flex-col space-y-2">
             <label htmlFor="promotionsInfo" className="text-sm font-medium text-slate-300">Promociones</label>
-            <textarea id="promotionsInfo" name="promotionsInfo" rows={3} value={localConfig.promotionsInfo} onChange={handleInputChange} className="bg-slate-700 border border-slate-600 text-white text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5 transition duration-200" placeholder="Informa sobre descuentos actuales." maxLength={localConfig.promotionsInfoCharLimit} />
+            <textarea id="promotionsInfo" name="promotionsInfo" rows={3} value={localConfig.promotionsInfo} onChange={handleInputChange} className="bg-slate-700 border border-slate-600 text-white text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block w-full p-2.5 transition duration-200" placeholder="Informa sobre descuentos actuales." maxLength={localConfig.promotionsInfoCharLimit} />
             <div className="flex justify-between items-center text-xs text-slate-400 mt-1">
                 <span>Límite de caracteres:</span>
                 <input type="number" name="promotionsInfoCharLimit" value={localConfig.promotionsInfoCharLimit} onChange={handleInputChange} className="w-20 bg-slate-600 text-white text-center rounded" min="50" max="2000" step="50" />
                 <span>{`${localConfig.promotionsInfo.length} / ${localConfig.promotionsInfoCharLimit}`}</span>
             </div>
-            <button onClick={() => handleEnhanceClick('promotionsInfo', 'Promociones Actuales')} disabled={isEnhancing.promotionsInfo} className="mt-2 w-full text-sm font-medium text-sky-400 bg-sky-400/10 hover:bg-sky-400/20 disabled:bg-slate-700 disabled:text-slate-400 disabled:cursor-not-allowed py-2 px-4 rounded-lg transition-colors">
+            <button onClick={() => handleEnhanceClick('promotionsInfo', 'Promociones Actuales')} disabled={isEnhancing.promotionsInfo} className="mt-2 w-full text-sm font-medium text-amber-400 bg-amber-400/10 hover:bg-amber-400/20 disabled:bg-slate-700 disabled:text-slate-400 disabled:cursor-not-allowed py-2 px-4 rounded-lg transition-colors">
               {isEnhancing.promotionsInfo ? 'Mejorando...' : 'Mejorar con IA ✨'}
             </button>
           </div>
@@ -296,25 +332,25 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ config, onConfigChange })
                 <button onClick={() => removeFaq(faq.id)} className="absolute top-2 right-2 text-slate-400 hover:text-red-400 transition-colors" aria-label="Eliminar FAQ">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16ZM8.707 7.293a1 1 0 0 0-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 1 0 1.414 1.414L10 11.414l1.293 1.293a1 1 0 0 0 1.414-1.414L11.414 10l1.293-1.293a1 1 0 0 0-1.414-1.414L10 8.586 8.707 7.293Z" clipRule="evenodd" /></svg>
                 </button>
-                <input type="text" placeholder={`Pregunta #${index + 1}`} value={faq.question} onChange={(e) => handleFaqChange(faq.id, 'question', e.target.value)} className="w-full bg-slate-600 border border-slate-500 text-white text-sm rounded-md focus:ring-sky-500 focus:border-sky-500 p-2 transition" maxLength={200} />
-                <textarea placeholder="Respuesta" rows={3} value={faq.answer} onChange={(e) => handleFaqChange(faq.id, 'answer', e.target.value)} className="w-full bg-slate-600 border border-slate-500 text-white text-sm rounded-md focus:ring-sky-500 focus:border-sky-500 p-2 transition resize-none" maxLength={500} />
+                <input type="text" placeholder={`Pregunta #${index + 1}`} value={faq.question} onChange={(e) => handleFaqChange(faq.id, 'question', e.target.value)} className="w-full bg-slate-600 border border-slate-500 text-white text-sm rounded-md focus:ring-amber-500 focus:border-amber-500 p-2 transition" maxLength={200} />
+                <textarea placeholder="Respuesta" rows={3} value={faq.answer} onChange={(e) => handleFaqChange(faq.id, 'answer', e.target.value)} className="w-full bg-slate-600 border border-slate-500 text-white text-sm rounded-md focus:ring-amber-500 focus:border-amber-500 p-2 transition resize-none" maxLength={500} />
                  <div className="text-right text-xs text-slate-400">
                     <span>{`${faq.question.length}/200`}</span> | <span>{`${faq.answer.length}/500`}</span>
                  </div>
               </div>
             ))}
           </div>
-          <button onClick={addFaq} disabled={localConfig.faqs.length >= MAX_FAQS} className="w-full text-sm font-medium text-sky-400 bg-sky-400/10 hover:bg-sky-400/20 disabled:bg-slate-700 disabled:text-slate-400 disabled:cursor-not-allowed py-2 px-4 rounded-lg transition-colors">
+          <button onClick={addFaq} disabled={localConfig.faqs.length >= MAX_FAQS} className="w-full text-sm font-medium text-amber-400 bg-amber-400/10 hover:bg-amber-400/20 disabled:bg-slate-700 disabled:text-slate-400 disabled:cursor-not-allowed py-2 px-4 rounded-lg transition-colors">
             Añadir FAQ
           </button>
         </div>
       </div>
       
       {/* Action Footer */}
-      <div className="p-6 border-t border-slate-700 bg-slate-800/80 backdrop-blur-sm">
+      <div className="p-6 border-t border-slate-700 bg-gray-900/80 backdrop-blur-sm">
         <button 
           onClick={handleSave}
-          className="w-full bg-sky-600 text-white font-bold py-2.5 px-4 rounded-lg hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-800 focus:ring-sky-500 transition-all duration-200 ease-in-out"
+          className="w-full bg-amber-600 text-white font-bold py-2.5 px-4 rounded-lg hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-amber-500 transition-all duration-200 ease-in-out"
         >
           Guardar Cambios
         </button>

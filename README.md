@@ -44,27 +44,35 @@ Sigue estos pasos para ejecutar el proyecto en tu máquina local.
 
 ### Paso 2: Configurar tu API Key
 
-1.  En la carpeta raíz del proyecto, busca o crea un archivo llamado `.env.local`.
-2.  Abre el archivo y añade la siguiente línea, reemplazando `AQUI_VA_TU_API_KEY` con la clave que obtuviste de Google AI Studio:
+Por razones de seguridad, la API Key no debe escribirse directamente en el código fuente. La cargaremos a través de un archivo de entorno que no se debe compartir.
 
+1.  En la carpeta principal del proyecto, crea un nuevo archivo llamado `env.js`.
+2.  Abre el archivo `env.js` y pega el siguiente código:
+
+    ```javascript
+    // Este archivo simula las variables de entorno para el navegador.
+    window.process = {
+      env: {
+        API_KEY: "AQUI_VA_TU_API_KEY"
+      }
+    };
     ```
-    VITE_GEMINI_API_KEY="AQUI_VA_TU_API_KEY"
-    ```
 
-    *Nota: El archivo `.env.local` está incluido en el `.gitignore` para prevenir que tu clave secreta se suba accidentalmente a un repositorio.*
+3.  **Importante**: Reemplaza el texto `"AQUI_VA_TU_API_KEY"` con la clave que obtuviste de Google AI Studio.
 
-### Paso 3: Instalar Dependencias y Ejecutar el Proyecto
+### Paso 3: Iniciar un Servidor Local
 
-1.  Abre una terminal en la carpeta raíz del proyecto.
-2.  Instala las dependencias necesarias con el siguiente comando:
+Debido a las políticas de seguridad de los navegadores, no puedes abrir el archivo `index.html` directamente. Necesitas servir los archivos a través de un servidor local.
+
+1.  Abre una terminal o línea de comandos en la carpeta raíz del proyecto.
+2.  Ejecuta el siguiente comando. Esto descargará y ejecutará un servidor web simple.
+
     ```bash
-    npm install
+    npx serve
     ```
-3.  Inicia el servidor de desarrollo de Vite:
-    ```bash
-    npm run dev
-    ```
-4.  La terminal te mostrará una URL local (generalmente `http://localhost:5173`). Ábrela en tu navegador.
+
+3.  La terminal te mostrará una o más direcciones URL, usualmente algo como `http://localhost:3000`.
+4.  Abre esa URL en tu navegador.
 
 ¡Listo! La aplicación del Asistente de Clientes IA debería estar funcionando.
 

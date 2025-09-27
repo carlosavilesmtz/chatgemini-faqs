@@ -55,7 +55,10 @@ const findSplitPoint = (text: string, maxLength: number): number => {
 };
 
 
-const ChatInterface: React.FC = () => {
+const ChatInterface: React.FC<{
+  isSettingsVisible: boolean;
+  onToggleSettings: () => void;
+}> = ({ isSettingsVisible, onToggleSettings }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [usageStats, setUsageStats] = useState<UsageStats>({
@@ -94,7 +97,7 @@ const ChatInterface: React.FC = () => {
         answer: 'Aceptamos tarjetas de crédito (Visa, MasterCard, American Express) y transferencias bancarias.'
       }
     ],
-    
+    googleCalendarIntegration: false,
     proactiveAssistant: false,
   });
 
@@ -216,13 +219,18 @@ const ChatInterface: React.FC = () => {
   }, [messages, config]);
 
   return (
-    <div className="flex flex-col lg:flex-row w-full h-full font-sans bg-slate-900 text-white rounded-b-xl overflow-hidden">
-      <main className="flex-1 flex flex-col h-full min-w-0">
+    <div className="relative flex w-full h-full font-sans bg-slate-900 text-white rounded-b-xl overflow-hidden">
+      <main className="flex-1 flex flex-col h-full min-w-0 bg-slate-800">
         <ChatWindow messages={messages} isLoading={isLoading} config={config} />
         <MessageInput onSendMessage={handleSendMessage} isLoading={isLoading} stats={usageStats} />
       </main>
-      <aside className="w-full lg:w-auto lg:max-w-md xl:max-w-lg h-full">
-        <SettingsPanel config={config} onConfigChange={setConfig} />
+      <aside className={`
+        transition-transform duration-300 ease-in-out transform
+        absolute top-0 right-0 h-full w-full max-w-md
+        lg:relative lg:max-w-md xl:max-w-lg
+        ${isSettingsVisible ? 'translate-x-0' : 'translate-x-full'}
+      `}>
+        <SettingsPanel config={config} onConfigChange={setConfig} onHide={onToggleSettings} />
       </aside>
     </div>
   );
@@ -240,11 +248,31 @@ const CloseIcon = () => (
     </svg>
 );
 
+const SettingsIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+  </svg>
+);
+
 
 const App: React.FC = () => {
     const [isOpen, setIsOpen] = useState(false);
+    const [isSettingsVisible, setIsSettingsVisible] = useState(false);
 
     const toggleChat = () => setIsOpen(!isOpen);
+    const toggleSettings = () => setIsSettingsVisible(!isSettingsVisible);
+
+    // Default to open on desktop, closed on mobile
+    useEffect(() => {
+        if (isOpen) {
+            if (window.innerWidth >= 1024) {
+                setIsSettingsVisible(true);
+            } else {
+                setIsSettingsVisible(false);
+            }
+        }
+    }, [isOpen]);
 
     return (
         <>
@@ -253,7 +281,7 @@ const App: React.FC = () => {
             {!isOpen && (
                 <button
                     onClick={toggleChat}
-                    className="fixed bottom-6 right-6 w-16 h-16 bg-sky-600 text-white rounded-full shadow-lg flex items-center justify-center hover:bg-sky-700 transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 z-50"
+                    className="fixed bottom-6 right-6 w-16 h-16 bg-amber-600 text-white rounded-full shadow-lg flex items-center justify-center hover:bg-amber-700 transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 z-50"
                     aria-label="Abrir chat"
                 >
                     <ChatIcon />
@@ -264,16 +292,25 @@ const App: React.FC = () => {
                 <div className="fixed bottom-6 right-6 lg:w-[800px] w-[90vw] lg:h-[700px] h-[85vh] bg-slate-900 rounded-xl shadow-2xl flex flex-col z-50 animate-fade-in-up">
                     <header className="flex items-center justify-between p-4 bg-slate-800 rounded-t-xl border-b border-slate-700 flex-shrink-0">
                         <h2 className="text-lg font-bold text-white">Asistente Virtual</h2>
-                        <button
-                            onClick={toggleChat}
-                            className="text-slate-400 hover:text-white"
-                            aria-label="Cerrar chat"
-                        >
-                            <CloseIcon />
-                        </button>
+                        <div className="flex items-center space-x-2">
+                           <button
+                                onClick={toggleSettings}
+                                className="text-slate-400 hover:text-white"
+                                aria-label="Configuración"
+                            >
+                                <SettingsIcon />
+                            </button>
+                            <button
+                                onClick={toggleChat}
+                                className="text-slate-400 hover:text-white"
+                                aria-label="Cerrar chat"
+                            >
+                                <CloseIcon />
+                            </button>
+                        </div>
                     </header>
                     <div className="flex-1 min-h-0">
-                        <ChatInterface />
+                        <ChatInterface isSettingsVisible={isSettingsVisible} onToggleSettings={toggleSettings} />
                     </div>
                 </div>
             )}

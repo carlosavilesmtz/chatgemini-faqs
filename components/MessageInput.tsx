@@ -136,7 +136,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ onSendMessage, isLoading, s
   }
 
   return (
-    <div className="p-4 bg-slate-900 border-t border-slate-700">
+    <div className="p-4 bg-slate-800 border-t border-slate-700">
       <TokenUsage stats={stats} />
       <form onSubmit={handleSubmit} className="flex items-center space-x-3">
         <textarea
@@ -145,7 +145,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ onSendMessage, isLoading, s
           onKeyDown={handleKeyDown}
           placeholder={isListening ? "Escuchando..." : "Escribe tu pregunta aquí..."}
           rows={1}
-          className="flex-1 bg-slate-700 border border-slate-600 text-white text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5 transition duration-200 resize-none"
+          className="flex-1 bg-slate-700 border border-slate-600 text-white text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block w-full p-2.5 transition duration-200 resize-none"
           disabled={isLoading}
         />
         <button
@@ -164,7 +164,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ onSendMessage, isLoading, s
         <button
           type="submit"
           disabled={isLoading || !input.trim()}
-          className="inline-flex justify-center p-2 text-white rounded-full cursor-pointer bg-sky-600 hover:bg-sky-700 disabled:bg-slate-500 disabled:cursor-not-allowed transition-colors duration-200"
+          className="inline-flex justify-center p-2 text-white rounded-full cursor-pointer bg-amber-600 hover:bg-amber-700 disabled:bg-slate-500 disabled:cursor-not-allowed transition-colors duration-200"
         >
           <svg className="w-6 h-6 rotate-90" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
             <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.428A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"></path>
