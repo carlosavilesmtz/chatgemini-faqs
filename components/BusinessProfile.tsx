@@ -1,128 +1,194 @@
-import React from 'react';
+import React, { useState } from 'react';
 
-// --- Iconos SVG para usar en el componente ---
+// --- Helper Components ---
 
-const LogoIcon = () => (
-  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M12 2L2 7L12 12L22 7L12 2Z" className="fill-amber-500" />
-    <path d="M2 17L12 22L22 17L12 12L2 17Z" className="fill-amber-700" />
-    <path d="M2 7L12 12L22 7" stroke="white" strokeWidth="0.5" strokeLinejoin="round" />
-    <path d="M2 12V17" stroke="white" strokeWidth="0.5" strokeLinejoin="round" />
-    <path d="M22 12V17" stroke="white" strokeWidth="0.5" strokeLinejoin="round" />
-    <path d="M12 17V22" stroke="white" strokeWidth="0.5" strokeLinejoin="round" />
-  </svg>
+const Alert = ({ title, children }) => (
+    <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-r-lg my-4" role="alert">
+        <p className="font-bold">{title}</p>
+        <p>{children}</p>
+    </div>
 );
 
-const ServiceIcon1 = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-amber-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-  </svg>
-);
+const FaqItem = ({ question, children }) => {
+    const [isOpen, setIsOpen] = useState(false);
+    return (
+        <div className="border-b">
+            <button
+                onClick={() => setIsOpen(!isOpen)}
+                className="w-full text-left flex justify-between items-center py-4 font-semibold text-lg"
+            >
+                <span>{question}</span>
+                <span>{isOpen ? '-' : '+'}</span>
+            </button>
+            {isOpen && <div className="pb-4 text-gray-600">{children}</div>}
+        </div>
+    );
+};
 
-const ServiceIcon2 = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-amber-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-    <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-  </svg>
-);
-
-const ServiceIcon3 = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-amber-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-    <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-  </svg>
-);
-
-const ProductPlaceholderIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-    </svg>
-);
-
-// --- Componente principal del Perfil de Negocio ---
 
 const BusinessProfile: React.FC = () => {
-  const services = [
-    { icon: <ServiceIcon1 />, title: "Sistema ERP Personalizado", description: "Implementamos 'Optimizador Pro' para unificar y automatizar todos los procesos de tu empresa." },
-    { icon: <ServiceIcon2 />, title: "Plataforma CRM a Medida", description: "Con 'Conecta CRM', gestiona y fortalece las relaciones con tus clientes de manera eficiente." },
-    { icon: <ServiceIcon3 />, title: "Análisis de Datos Avanzado", description: "Utiliza 'Analítica Web' para obtener insights valiosos y tomar decisiones basadas en datos." },
-  ];
+    return (
+        <div className="bg-slate-100 text-gray-800 font-sans">
+            <div className="container mx-auto px-4 sm:px-6 md:px-8 py-8">
 
-  const products = [
-    { name: "Optimizador Pro", description: "Solución integral para la planificación de recursos empresariales." },
-    { name: "Conecta CRM", description: "Plataforma líder para la gestión de la relación con el cliente." },
-    { name: "Analítica Web", description: "Herramienta potente para el seguimiento y análisis de métricas web." },
-  ];
+                <header className="text-center mb-12">
+                    <img src="https://via.placeholder.com/1200x400.png?text=Festival+Internacional+del+Globo+2025" alt="Carin Leon Concert" className="w-full h-auto object-cover rounded-lg shadow-lg mb-6"/>
+                    <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 tracking-tight">Carín León en el Festival Internacional del Globo (FIG) 2025</h1>
+                    <p className="mt-4 text-lg text-gray-600 max-w-4xl mx-auto">
+                        Este es un blueprint de desarrollo para un sitio web de alta especificación, enfocado en la jornada del domingo 16 de noviembre de 2025, y el concierto estelar de Carín León.
+                    </p>
+                </header>
 
-  return (
-    <div className="bg-slate-900 text-white min-h-screen font-sans">
-      <div className="container mx-auto px-6 py-12">
-        
-        {/* Encabezado */}
-        <header className="text-center mb-12">
-          <div className="inline-block mb-4">
-            <LogoIcon />
-          </div>
-          <h1 className="text-5xl font-extrabold text-white tracking-tight">Innovatech Solutions</h1>
-          <p className="text-lg text-slate-400 mt-2 max-w-2xl mx-auto">Ayudamos a las empresas a optimizar sus procesos a través de la tecnología y la innovación.</p>
-        </header>
+                <main className="space-y-16">
+                    
+                    {/* Section I: EL EVENTO CENTRAL */}
+                    <section id="evento">
+                        <h2 className="text-3xl font-bold mb-6 border-b-2 pb-2">I. El Evento Central: Domingo 16 de Noviembre</h2>
+                        
+                        <div className="space-y-4 text-gray-700">
+                            <p>La jornada de clausura del FIG 2025 representa el pico de afluencia del festival, combinando el espectáculo aerostático matutino con el cierre musical de talla internacional a cargo de Carín León, uno de los artistas más esperados.</p>
+                            <h3 className="text-2xl font-semibold pt-4">I.A. Contexto General del Festival y Localización</h3>
+                            <p>El Festival Internacional del Globo 2025 se llevará a cabo del viernes 14 al lunes 17 de noviembre en el <strong>Parque Metropolitano de León, Guanajuato</strong>. El horario del parque es de <strong>05:00 Hrs a 22:30 Hrs</strong>.</p>
+                            <p>El evento del domingo 16 de noviembre está anclado por la actuación de Carín León, siguiendo a Gloria Trevi el viernes 14 y Martin Garrix el sábado 15.</p>
+                            
+                            <h3 className="text-2xl font-semibold pt-4">I.B. Programa Proyectado y la Brecha Crítica de Horarios</h3>
+                            <p>El inflado de los globos comienza alrededor de las 06:30 Hrs, con el despegue proyectado a las 08:00 Hrs. La Noche Mágica se proyecta a las 19:00 Hrs, seguida por el concierto de Carín León en el Main Stage.</p>
+                            
+                            <Alert title="Gestión de la Incertidumbre Horaria">
+                                La hora exacta de inicio del concierto de Carín León no ha sido publicada. Basado en eventos similares, la proyección más lógica sitúa el inicio entre las <strong>20:30 Hrs y las 21:00 Hrs</strong>. Esta información es una proyección y está <strong>sujeta a cambios</strong>.
+                            </Alert>
 
-        {/* Información de Contacto y CTA */}
-        <div className="bg-slate-800/50 rounded-xl p-8 mb-16 flex flex-col md:flex-row justify-between items-center gap-8 border border-slate-700">
-            <div className="text-center md:text-left">
-                <h2 className="text-2xl font-bold text-white mb-2">¿Listo para transformar tu negocio?</h2>
-                <p className="text-slate-300">Contáctanos para una demostración personalizada.</p>
-                <div className="mt-4 text-slate-400 space-y-1">
-                    <p><strong>Email:</strong> contacto@innovatech.com</p>
-                    <p><strong>Teléfono:</strong> +52 55 1234 5678</p>
-                </div>
-            </div>
-            <div className="flex flex-col sm:flex-row gap-4">
-                <button className="bg-amber-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-amber-700 transition-colors duration-200">
-                    Solicitar Cotización
-                </button>
-                <button className="bg-slate-700 text-white font-bold py-3 px-6 rounded-lg hover:bg-slate-600 transition-colors duration-200">
-                    Contactar Ventas
-                </button>
+                            <h3 className="text-2xl font-semibold pt-4">I.C. Tabla I: Programa Proyectado del Domingo 16 de Noviembre</h3>
+                            <div className="overflow-x-auto shadow-md rounded-lg">
+                                <table className="w-full text-sm text-left text-gray-500">
+                                    <thead className="text-xs text-gray-700 uppercase bg-gray-200">
+                                        <tr>
+                                            <th scope="col" className="px-6 py-3">Actividad</th>
+                                            <th scope="col" className="px-6 py-3">Horario</th>
+                                            <th scope="col" className="px-6 py-3">Detalles Clave</th>
+                                            <th scope="col" className="px-6 py-3">Ubicación</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr className="bg-white border-b"><td className="px-6 py-4">Apertura del Parque / Ingreso Day Pass</td><td className="px-6 py-4">05:00 Hrs</td><td className="px-6 py-4">Acceso a todas las actividades.</td><td className="px-6 py-4">Todos los accesos</td></tr>
+                                        <tr className="bg-gray-50 border-b"><td className="px-6 py-4">Inflado de Globos</td><td className="px-6 py-4">06:30 Hrs</td><td className="px-6 py-4">Sujeto a clima.</td><td className="px-6 py-4">Aeródromo FIG</td></tr>
+                                        <tr className="bg-white border-b"><td className="px-6 py-4">Despegue de Globos</td><td className="px-6 py-4">08:00 Hrs (Proyección)</td><td className="px-6 py-4">Más de 200 aeronaves.</td><td className="px-6 py-4">Aeródromo FIG</td></tr>
+                                        <tr className="bg-gray-50 border-b"><td className="px-6 py-4">Ingreso Acceso Vespertino</td><td className="px-6 py-4">13:00 Hrs</td><td className="px-6 py-4">Para eventos estelares.</td><td className="px-6 py-4">Todos los accesos</td></tr>
+                                        <tr className="bg-white border-b"><td className="px-6 py-4">Ingreso Acceso VIP Carín León</td><td className="px-6 py-4">16:00 Hrs</td><td className="px-6 py-4">Acceso a zona preferencial.</td><td className="px-6 py-4">Zona VIP / Main Stage</td></tr>
+                                        <tr className="bg-gray-50 border-b"><td className="px-6 py-4">Noche Mágica FIG</td><td className="px-6 py-4">19:00 Hrs (Proyección)</td><td className="px-6 py-4">Espectáculo de luz y música.</td><td className="px-6 py-4">Aeródromo FIG</td></tr>
+                                        <tr className="bg-white border-b"><td className="px-6 py-4 font-bold">Concierto Estelar: CARÍN LEÓN</td><td className="px-6 py-4 font-bold">20:30 Hrs (Proyección)</td><td className="px-6 py-4">Evento principal de la noche.</td><td className="px-6 py-4">Main Stage</td></tr>
+                                        <tr className="bg-gray-50 border-b"><td className="px-6 py-4">Cierre de Actividades</td><td className="px-6 py-4">21:00 Hrs</td><td className="px-6 py-4">Límite de salida para Day Pass/Vespertino.</td><td className="px-6 py-4">Parque Metropolitano</td></tr>
+                                        <tr className="bg-white"><td className="px-6 py-4">Cierre Total del Parque</td><td className="px-6 py-4">22:30 Hrs</td><td className="px-6 py-4">Hora final de permanencia.</td><td className="px-6 py-4">Parque Metropolitano</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* Section II: ESTRUCTURA COMERCIAL */}
+                    <section id="boletos">
+                        <h2 className="text-3xl font-bold mb-6 border-b-2 pb-2">II. Estructura Comercial y Boletos</h2>
+                        <div className="grid md:grid-cols-3 gap-8 text-center">
+                            <div className="border p-6 rounded-lg shadow-lg bg-white">
+                                <h3 className="text-xl font-bold">Day Pass</h3>
+                                <p className="text-3xl font-bold my-4">$750.00 <span className="text-sm font-normal">MXN</span></p>
+                                <p className="text-gray-600">Acceso de 05:00 a 21:00 Hrs. Incluye TODAS las actividades.</p>
+                                <p className="mt-4 font-semibold text-green-600">¡La mejor opción para la experiencia completa!</p>
+                            </div>
+                            <div className="border p-6 rounded-lg shadow-lg bg-white">
+                                <h3 className="text-xl font-bold">Acceso Vespertino</h3>
+                                <p className="text-3xl font-bold my-4">$635.00 <span className="text-sm font-normal">MXN</span></p>
+                                <p className="text-gray-600">Acceso de 13:00 a 21:00 Hrs. Enfocado en Noche Mágica y Concierto.</p>
+                            </div>
+                            <div className="border p-6 rounded-lg shadow-lg bg-white">
+                                <h3 className="text-xl font-bold">Abono FIG</h3>
+                                <p className="text-3xl font-bold my-4">$2,200.00 <span className="text-sm font-normal">MXN</span></p>
+                                <p className="text-gray-600">Acceso a los 4 días del festival (14-17 Nov).</p>
+                            </div>
+                        </div>
+                        <div className="mt-8 space-y-4">
+                            <h3 className="text-2xl font-semibold pt-4">II.B. La Experiencia VIP Exclusiva para Carín León</h3>
+                            <p>Se ofrece una Zona VIP con boleto especial que incluye acceso general y una zona preferente con amenidades, baños y puntos de venta exclusivos. El acceso a la Zona VIP inicia a las <strong>16:00 Hrs</strong> para gestionar el flujo de manera escalonada y garantizar una experiencia premium.</p>
+                            
+                            <Alert title="Política de Venta y Contingencia Climática">
+                                <strong>No hay reembolso, cambio o reposición</strong> en caso de que el clima impida la realización de actividades. La compra del boleto es por el acceso al festival, no por un acto específico.
+                            </Alert>
+                        </div>
+                    </section>
+
+                    {/* Section III: LOGÍSTICA DE VISITANTES */}
+                    <section id="logistica">
+                        <h2 className="text-3xl font-bold mb-6 border-b-2 pb-2">III. Logística de Visitantes</h2>
+                        <div className="space-y-4">
+                            <p>Se recomienda utilizar los tres accesos principales: <strong>Acceso Principal Parque, Acceso Amazonas y Acceso Balcones</strong>.</p>
+                            <h3 className="text-2xl font-semibold pt-4">III.B. Estacionamiento y Transporte</h3>
+                            <p>Hay estacionamientos remotos con servicio de shuttle. Costo: $11 MXN general, $6 MXN infantes.</p>
+                            <Alert title="⚠️ Riesgo de Transporte de Cierre">
+                                El servicio de shuttle desde estacionamientos remotos opera solo hasta las <strong>22:00 Hrs</strong>, mientras que el parque cierra a las <strong>22:30 Hrs</strong>. Planifique su salida con antelación para evitar el colapso logístico y tarifas de taxi/plataformas muy elevadas.
+                            </Alert>
+                            <h3 className="text-2xl font-semibold pt-4">III.C. Normativa de Seguridad</h3>
+                             <div className="overflow-x-auto shadow-md rounded-lg">
+                                <table className="w-full text-sm text-left text-gray-500">
+                                    <thead className="text-xs text-gray-700 uppercase bg-gray-200">
+                                        <tr>
+                                            <th scope="col" className="px-6 py-3">Categoría</th>
+                                            <th scope="col" className="px-6 py-3">Ítem Estrictamente Prohibido</th>
+                                            <th scope="col" className="px-6 py-3">Justificación</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr className="bg-white border-b"><td className="px-6 py-4">Controles Legales</td><td className="px-6 py-4">Armas, Sustancias Ilícitas, Bebidas Alcohólicas</td><td className="px-6 py-4">Seguridad pública.</td></tr>
+                                        <tr className="bg-gray-50 border-b"><td className="px-6 py-4">Seguridad Física</td><td className="px-6 py-4">Botellas de Vidrio, Objetos Punzocortantes</td><td className="px-6 py-4">Prevención de lesiones.</td></tr>
+                                        <tr className="bg-white border-b"><td className="px-6 py-4">Seguridad Aérea</td><td className="px-6 py-4">Drones</td><td className="px-6 py-4">Riesgo de colisión con aeronaves.</td></tr>
+                                        <tr className="bg-gray-50"><td className="px-6 py-4">Operacional</td><td className="px-6 py-4">Fumar en Zona de Despegue</td><td className="px-6 py-4">Riesgo de incendio.</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* Section IV: EXPERIENCIA DEL ASISTENTE */}
+                    <section id="recomendaciones">
+                        <h2 className="text-3xl font-bold mb-6 border-b-2 pb-2">IV. Experiencia del Asistente</h2>
+                        <ul className="list-disc list-inside space-y-2 text-gray-700">
+                            <li><strong>Vestimenta y Clima:</strong> Vestir en capas. El clima es variable (frío en la madrugada, calor de día, frío de noche).</li>
+                            <li><strong>Calzado:</strong> Usar calzado cómodo es obligatorio debido a las largas caminatas.</li>
+                            <li><strong>Planificación:</strong> Establecer un punto de encuentro fijo con familiares y amigos.</li>
+                            <li><strong>Seguridad:</strong> Localizar los servicios de emergencia al llegar.</li>
+                            <li><strong>Medio Ambiente:</strong> Ayudar a mantener limpio el parque y llevar bolsas para la basura propia.</li>
+                        </ul>
+                    </section>
+
+                    {/* Section V: FAQ */}
+                    <section id="faq">
+                        <h2 className="text-3xl font-bold mb-6 border-b-2 pb-2">V. Preguntas Frecuentes (FAQ)</h2>
+                        <div className="space-y-2">
+                            <FaqItem question="¿Se requiere un boleto especial para el concierto de Carín León?">
+                                <p>No. El concierto está incluido en la entrada del domingo 16 de noviembre (Day Pass o Acceso Vespertino).</p>
+                            </FaqItem>
+                            <FaqItem question="¿A qué hora comienza el concierto estelar?">
+                                <p>La hora exacta está pendiente de confirmación. Se proyecta que inicie entre las <strong>20:30 Hrs y 21:00 Hrs</strong>. Consulta el programa oficial en tiempo real.</p>
+                            </FaqItem>
+                            <FaqItem question="Si el clima cancela el evento, ¿hay reembolso?">
+                                <p><strong>No.</strong> El boleto es para el acceso al festival y no es reembolsable si las actividades se cancelan por mal tiempo.</p>
+                            </FaqItem>
+                            <FaqItem question="¿Hasta qué hora hay transporte al estacionamiento remoto?">
+                                <p>El servicio de shuttle opera solo hasta las <strong>22:00 Hrs</strong>. Si planeas quedarte hasta el cierre del parque (22:30 Hrs), debes prever transporte privado.</p>
+                            </FaqItem>
+                            <FaqItem question="¿Puedo ingresar con mi dron o bebidas alcohólicas?">
+                                <p>No. Los drones, bebidas alcohólicas, botellas de vidrio y armas están estrictamente prohibidos.</p>
+                            </FaqItem>
+                        </div>
+                    </section>
+                </main>
+
+                <footer className="text-center mt-16 pt-8 border-t">
+                    <p className="text-sm text-gray-500">Este contenido es un blueprint de desarrollo y se basa en la información y proyecciones disponibles. La información oficial del evento prevalecerá.</p>
+                </footer>
+
             </div>
         </div>
-
-        {/* Sección de Servicios */}
-        <section className="mb-16">
-          <h2 className="text-3xl font-bold text-center mb-10">Nuestros Servicios</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {services.map((service, index) => (
-              <div key={index} className="bg-slate-800 p-8 rounded-xl border border-slate-700 text-center hover:border-amber-500 hover:scale-105 transition-all duration-300">
-                {service.icon}
-                <h3 className="text-xl font-semibold mb-2">{service.title}</h3>
-                <p className="text-slate-400">{service.description}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Sección de Productos */}
-        <section>
-          <h2 className="text-3xl font-bold text-center mb-10">Nuestros Productos</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {products.map((product, index) => (
-              <div key={index} className="bg-slate-800 rounded-xl overflow-hidden border border-slate-700 flex flex-col group">
-                <div className="bg-slate-700 h-48 flex items-center justify-center group-hover:bg-slate-600 transition-colors">
-                  <ProductPlaceholderIcon />
-                </div>
-                <div className="p-6 flex-grow flex flex-col">
-                  <h3 className="text-xl font-semibold mb-2">{product.name}</h3>
-                  <p className="text-slate-400 flex-grow">{product.description}</p>
-                   <a href="#" className="mt-4 self-start text-amber-400 font-semibold hover:text-amber-300 transition-colors">
-                    Ver más &rarr;
-                  </a>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-      </div>
-    </div>
-  );
+    );
 };
 
 export default BusinessProfile;
